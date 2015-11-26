@@ -477,7 +477,9 @@ LRESULT CDXView::CDX::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				float eulerY = (mousePosY-0.5f) *3.1416;
 				
 				m_BoneEulers[m_boneIndex].setYaw(Ogre::Radian(eulerX));
-				m_BoneEulers[m_boneIndex].setPitch(Ogre::Radian(eulerY));
+				//m_BoneEulers[m_boneIndex].setPitch(Ogre::Radian(eulerY));
+				m_BoneEulers[m_boneIndex].setRoll(Ogre::Radian(eulerY));
+
 
 			}
 		}
