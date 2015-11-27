@@ -108,7 +108,7 @@ HRESULT CDXView::CDX::InitOgre( HWND hWnd )
 
 	Ogre::SceneManager *SceneManager = NULL;
 	SceneManager = root->createSceneManager(Ogre::ST_GENERIC, "MFCOgre");
-	SceneManager->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	SceneManager->setAmbientLight(Ogre::ColourValue(0.9, 0.9, 0.9));
 
 
 	// Create the camera
@@ -157,7 +157,7 @@ HRESULT CDXView::CDX::InitGeometry()
 	Ogre::SceneNode *RobotNode = SceneManager->getRootSceneNode() ->createChildSceneNode();
 	RobotNode->attachObject(m_entity);
 
-	m_entity->setMaterialName("Examples/Robot"); //"jaiquaDualQuatTest"
+	//m_entity->setMaterialName("Examples/Fish"); //"jaiquaDualQuatTest"
 
 
 	Ogre::AxisAlignedBox Box = m_entity->getBoundingBox();
