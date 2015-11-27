@@ -117,7 +117,9 @@ HRESULT CDXView::CDX::InitOgre( HWND hWnd )
 	m_Camera->setFarClipDistance(5000);
 	m_Camera->setCastShadows(false);
 	m_Camera->setUseRenderingDistance(true);
-	m_Camera->setPosition(Ogre::Vector3(200.0, 50.0, 100.0));
+//	m_Camera->setPosition(Ogre::Vector3(200.0, 50.0, 100.0));
+	m_Camera->setPosition(Ogre::Vector3(2.0, 2.0, 5.0));
+
 	Ogre::SceneNode *CameraNode = NULL;
 	CameraNode = SceneManager->getRootSceneNode() ->createChildSceneNode("CameraNode");
 
@@ -148,11 +150,14 @@ HRESULT CDXView::CDX::InitGeometry()
 
 
 
-	m_entity = SceneManager->createEntity("Robot", "robot.mesh");
+//	m_entity = SceneManager->createEntity("Robot", "robot.mesh");
+	m_entity = SceneManager->createEntity("Robot", "Geometry1.mesh");
+
+
 	Ogre::SceneNode *RobotNode = SceneManager->getRootSceneNode() ->createChildSceneNode();
 	RobotNode->attachObject(m_entity);
 
-	//RobotEntity->setMaterialName("Examples/Robot"); //"jaiquaDualQuatTest"
+	m_entity->setMaterialName("Examples/Robot"); //"jaiquaDualQuatTest"
 
 
 	Ogre::AxisAlignedBox Box = m_entity->getBoundingBox();
@@ -171,6 +176,19 @@ HRESULT CDXView::CDX::InitGeometry()
     return S_OK;
 }
 
+void CDXView::CDX::setupBone2(const Ogre::String& name, const Ogre::Quaternion& q)
+{
+	Ogre::Bone* bone = m_entity->getSkeleton()->getBone(name);
+	bone->setManuallyControlled(true);
+
+//	bone->getOrientation();
+	bone->setInheritOrientation(true);
+
+	//bone->resetOrientation();
+	//bone->setOrientation(q);
+
+	bone->setInitialState();
+}
 
 void CDXView::CDX::setupBone(const Ogre::String& name, const Ogre::Quaternion& q)
 {
@@ -189,6 +207,8 @@ void CDXView::CDX::setupAnimations()
 {
 	// this is very important due to the nature of the exported animations
 	//entidadPersonaje->getSkeleton()->setBlendMode(ANIMBLEND_CUMULATIVE);	
+
+	/*
 	Ogre::String bones[] =
 	{ "Joint1", 
 	  "Joint2", 
@@ -209,10 +229,43 @@ void CDXView::CDX::setupAnimations()
 	  "Joint17",
 	  "Joint18"
 	};
+	int boneCount = 18;
+
+	*/
+	Ogre::String bones[] =
+	{
+		"VisualSceneNode1",
+		"VisualSceneNode2",
+		"VisualSceneNode3",
+		"VisualSceneNode4",
+		"VisualSceneNode5",
+		"VisualSceneNode6",
+		"bonefootl",
+		"VisualSceneNode8",
+		"VisualSceneNode9",
+		"VisualSceneNode10",
+		"bonefootr",
+		"VisualSceneNode12",
+		"VisualSceneNode14",
+		"VisualSceneNode15",
+		"VisualSceneNode36",
+		"VisualSceneNode17",
+		"bonendingl",
+		"VisualSceneNode37",
+		"VisualSceneNode38",
+		"VisualSceneNode39",
+		"VisualSceneNode40",
+		"VisualSceneNode41",
+		"VisualSceneNode62",
+		"VisualSceneNode43",
+		"boneendingr"
+	};
 
 
+	int boneCount = 25;
 
-	for (int i = 0; i < 18; i++)
+
+	for (int i = 0; i < boneCount; i++)
 	{
 		m_BoneNames.push_back(new Ogre::String(bones[i]));
 		m_BoneEulers.push_back (Ogre::Euler());
@@ -228,7 +281,7 @@ void CDXView::CDX::setupAnimations()
 	for (int i = 0; i < m_BoneNames.size(); i++)
 	{
 		Ogre::String& boneName = *m_BoneNames[i];
-		setupBone( boneName, q);
+		setupBone2( boneName, q);
 
 	}
 
@@ -268,8 +321,9 @@ void  CDXView::CDX::transformBone(const Ogre::String& modelBoneName, Ogre::Euler
 
 	{
    	    newQ = euler.toQuaternion();
+	 
 		bone->resetOrientation(); //in order for the conversion from world to local to work.
-		newQ = bone->convertWorldToLocalOrientation(newQ);
+	//	newQ = bone->convertWorldToLocalOrientation(newQ);
 		bone->setOrientation(newQ*qI);
 	}
 }
@@ -285,13 +339,15 @@ bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	if (m_entity && !m_First)
 	{
 
-		Ogre::Euler boneEuler = m_BoneEulers[m_boneIndex];
-		Ogre::String& boneName = *m_BoneNames[m_boneIndex];
+		if (m_BoneEulers.size() > 0)
+		{
+			Ogre::Euler boneEuler = m_BoneEulers[m_boneIndex];
+			Ogre::String& boneName = *m_BoneNames[m_boneIndex];
 
-			
-		transformBone(boneName, boneEuler);
 
-		
+			transformBone(boneName, boneEuler);
+
+		}
 
 	}
 
@@ -477,8 +533,8 @@ LRESULT CDXView::CDX::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				float eulerY = (mousePosY-0.5f) *3.1416;
 				
 				m_BoneEulers[m_boneIndex].setYaw(Ogre::Radian(eulerX));
-				//m_BoneEulers[m_boneIndex].setPitch(Ogre::Radian(eulerY));
-				m_BoneEulers[m_boneIndex].setRoll(Ogre::Radian(eulerY));
+				m_BoneEulers[m_boneIndex].setPitch(Ogre::Radian(eulerY));
+			//	m_BoneEulers[m_boneIndex].setRoll(Ogre::Radian(eulerY));
 
 
 			}

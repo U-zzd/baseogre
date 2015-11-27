@@ -53,6 +53,8 @@ class CDXView : public CWnd
 			
 		void setupAnimations();
 		void setupBone(const Ogre::String& name, const Ogre::Quaternion& q);
+		void setupBone2(const Ogre::String& name, const Ogre::Quaternion& q);
+
 		void transformBone(const Ogre::String& modelBoneName, Ogre::Euler& euler);
 	
 	private:
