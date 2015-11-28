@@ -16,6 +16,9 @@
     <ClCompile Include="..\src\View.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\kinecthelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\DXApp.h">
@@ -133,6 +136,9 @@
       <Filter>Win32++</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ogreeuler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\kinecthelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

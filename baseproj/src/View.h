@@ -5,6 +5,7 @@
 #define VIEW_H
 #include "Ogre.h"
 #include "ogreeuler.h"
+#include "kinecthelper.h"
 
 // NOTE: for MS compilers you will need the DirectX SDK v9
 //       for Dev-C++ you will need the DirecX v9.0c DevPak
@@ -60,13 +61,14 @@ class CDXView : public CWnd
 	private:
 	
 		bool m_First;
-
+	
 		int m_boneIndex;
 		bool m_mouseDown;
 		Ogre::Euler m_boneOrients[18];
 		std::vector<Ogre::String*> m_BoneNames;
 		std::vector<Ogre::Euler> m_BoneEulers;
 
+		KinectHelper m_kinectHelper;
 
 		Ogre::Camera*m_Camera;
 		Ogre::RenderWindow*m_RenderWindow;

@@ -60,6 +60,18 @@
 #include <wxx_treeview.h>
 #include <wxx_webbrowser.h>
 #include <wxx_wincore.h>
+#include <Kinect.h>
 
+
+// Safe release for interfaces
+template<class Interface>
+inline void SafeRelease(Interface *& pInterfaceToRelease)
+{
+	if (pInterfaceToRelease != NULL)
+	{
+		pInterfaceToRelease->Release();
+		pInterfaceToRelease = NULL;
+	}
+}
 
 #endif

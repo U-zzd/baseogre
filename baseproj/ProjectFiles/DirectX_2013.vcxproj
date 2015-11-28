@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DXApp.cpp" />
+    <ClCompile Include="..\src\kinecthelper.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mainfrm.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
@@ -75,6 +76,7 @@
     <ClInclude Include="..\..\include\wincxx\wxx_wincore.h" />
     <ClInclude Include="..\..\include\wincxx\wxx_winutils.h" />
     <ClInclude Include="..\src\DXApp.h" />
+    <ClInclude Include="..\src\kinecthelper.h" />
     <ClInclude Include="..\src\Mainfrm.h" />
     <ClInclude Include="..\src\ogreeuler.h" />
     <ClInclude Include="..\src\resource.h" />
@@ -148,33 +150,38 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\Debug\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);$(KINECTSDK20_DIR)\lib\x86;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\debugx64\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_64|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\Debug\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);$(KINECTSDK20_DIR)\lib\x86;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_64|x64'">
     <LinkIncremental>true</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSdk_71A_LibraryPath_x86);$(KINECTSDK20_DIR)\lib\x86;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <EmbedManifest>false</EmbedManifest>
+    <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -192,7 +199,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateManifest>false</GenerateManifest>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comctl32.lib;Winmm.lib;..\..\lib\Debug\OgreMain_d.lib;..\..\boost\lib\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\lib\Debug\OgreRTShaderSystem_d.lib;..\..\lib\Debug\OgreTerrain_d.lib;..\..\lib\Debug\OgrePaging_d.lib;..\..\lib\Debug\OgreVolume_d.lib;..\..\lib\Debug\OgreOverlay_d.lib;..\..\lib\Debug\opt\RenderSystem_GL_d.lib;..\..\lib\Debug\OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;kinect20.lib;comctl32.lib;Winmm.lib;..\..\lib\Debug\OgreMain_d.lib;..\..\boost\lib\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\lib\Debug\OgreRTShaderSystem_d.lib;..\..\lib\Debug\OgreTerrain_d.lib;..\..\lib\Debug\OgrePaging_d.lib;..\..\lib\Debug\OgreVolume_d.lib;..\..\lib\Debug\OgreOverlay_d.lib;..\..\lib\Debug\opt\RenderSystem_GL_d.lib;..\..\lib\Debug\OIS_d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\..\..\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx</AdditionalIncludeDirectories>
@@ -236,7 +244,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateManifest>false</GenerateManifest>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comctl32.lib;Winmm.lib;..\..\lib\Debug\OgreMain_d.lib;..\..\boost\lib\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\lib\Debug\OgreRTShaderSystem_d.lib;..\..\lib\Debug\OgreTerrain_d.lib;..\..\lib\Debug\OgrePaging_d.lib;..\..\lib\Debug\OgreVolume_d.lib;..\..\lib\Debug\OgreOverlay_d.lib;..\..\lib\Debug\opt\RenderSystem_GL_d.lib;..\..\lib\Debug\OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;kinect20.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx</AdditionalIncludeDirectories>
@@ -280,7 +288,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateManifest>false</GenerateManifest>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;comctl32.lib;d3d9.lib;d3dx9.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;kinect20.lib</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>..\..\..\include</AdditionalIncludeDirectories>
