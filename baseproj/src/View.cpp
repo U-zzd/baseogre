@@ -12,6 +12,34 @@
 #include <OgreConfigFile.h>
 #include <OgreGLRenderSystem.h>
 
+
+const int VisualSceneNode1 = 0;
+const int VisualSceneNode2 = 1;
+const int VisualSceneNode3 = 2;
+const int VisualSceneNode4 = 3;
+const int VisualSceneNode5 = 4;
+const int VisualSceneNode6 = 5;
+const int bonefootl = 6;
+const int VisualSceneNode8 = 7;
+const int VisualSceneNode9 = 8;
+const int VisualSceneNode10 = 9;
+const int bonefootr = 10;
+const int VisualSceneNode12 = 11;
+const int VisualSceneNode14 = 12;
+const int VisualSceneNode15 = 13;
+const int VisualSceneNode36 = 14;
+const int VisualSceneNode17 = 15;
+const int bonendingl = 16;
+const int VisualSceneNode37 = 17;
+const int VisualSceneNode38 = 18;
+const int VisualSceneNode39 = 19;
+const int VisualSceneNode40 = 20;
+const int VisualSceneNode41 = 21;
+const int VisualSceneNode62 = 22;
+const int VisualSceneNode43 = 23;
+const int boneendingr = 24;
+int boneCount = 25;
+
 /////////////////////////////////////////////////
 // Definitions for the CDXView class
 //
@@ -136,6 +164,10 @@ HRESULT CDXView::CDX::InitOgre( HWND hWnd )
 	m_Camera->setAspectRatio(Ogre::Real(rect.Width()) /
 		Ogre::Real(rect.Height()));
 
+
+	new DebugDrawer(SceneManager, 0.5f);
+
+	m_debugDrawer = DebugDrawer::getSingletonPtr();
 
 
     return S_OK;
@@ -314,35 +346,19 @@ void CDXView::CDX::setupAnimations()
 		"VisualSceneNode43",
 		"boneendingr" };
 	
-	const int VisualSceneNode1 = 0;
-	const int VisualSceneNode2 = 1;
-	const int VisualSceneNode3 = 2;
-	const int VisualSceneNode4 = 3;
-	const int VisualSceneNode5 = 4;
-	const int VisualSceneNode6 = 5;
-	const int bonefootl = 6;
-	const int VisualSceneNode8 = 7;
-	const int VisualSceneNode9 = 8;
-	const int VisualSceneNode10 = 9;
-	const int bonefootr = 10;
-	const int VisualSceneNode12 = 11;
-	const int VisualSceneNode14 = 12;
-	const int VisualSceneNode15 = 13;
-	const int VisualSceneNode36 = 14;
-	const int VisualSceneNode17 = 15;
-	const int bonendingl = 16;
-	const int VisualSceneNode37 = 17;
-	const int VisualSceneNode38 = 18;
-	const int VisualSceneNode39 = 19;
-	const int VisualSceneNode40 = 20;
-	const int VisualSceneNode41 = 21;
-	const int VisualSceneNode62 = 22;
-	const int VisualSceneNode43 = 23;
-	const int boneendingr = 24;
-	int boneCount = 25;
+	enum 
+	{
+	
+	
+	
+	} ;
 
 
-	m_kinectHelper.setBoneMapping(JointType_SpineBase, VisualSceneNode1);	
+
+
+	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
+//	m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode62);
+
 
 	/*
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
@@ -372,9 +388,9 @@ void CDXView::CDX::setupAnimations()
 	{
 		m_BoneNames.push_back(new Ogre::String(bones[i]));
 		m_BoneEulers.push_back (Ogre::Euler());
-	
+		m_BoneQuats.push_back(Ogre::Quaternion::IDENTITY);
 	}
-
+	 
 	Ogre::AnimationStateSet* animations = m_entity->getAllAnimationStates();
 	Ogre::AnimationStateIterator it = animations->getAnimationStateIterator();
 
@@ -472,6 +488,48 @@ void  CDXView::CDX::transformBone(const Ogre::String& modelBoneName, Ogre::Euler
 		bone->setOrientation(newQ*qI);
 	}
 }
+
+
+void  CDXView::CDX::transformBone2(const Ogre::String& modelBoneName, Ogre::Quaternion& q, bool flip)
+{
+	Ogre::Skeleton* skel = m_entity->getSkeleton();
+	Ogre::Bone* bone = skel->getBone(modelBoneName);
+	Ogre::Quaternion qI = bone->getInitialOrientation();
+	Ogre::Quaternion newQ = Ogre::Quaternion::IDENTITY;
+
+	{
+		newQ = q;
+
+		bone->resetOrientation(); //in order for the conversion from world to local to work.
+		//	newQ = bone->convertWorldToLocalOrientation(newQ);
+		bone->setOrientation(newQ*qI);
+	}
+
+	/*
+	// Get the model skeleton bone info
+	Ogre::Skeleton* skel = m_entity->getSkeleton();
+	Ogre::Bone* bone = skel->getBone(modelBoneName);
+	Ogre::Quaternion qI = Ogre::Quaternion::IDENTITY;; // bone->getInitialOrientation();
+	Ogre::Quaternion newQ = q;
+
+	if (flip)
+	{
+	
+		Ogre::Quaternion yrot;
+		yrot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
+		newQ = yrot*q;
+		
+
+
+	}
+
+	{
+	
+		bone->setOrientation(newQ*qI);
+	}
+	*/
+}
+
 /*
 void  CDXView::CDX::transformBone(const Ogre::String& modelBoneName, Ogre::Euler& euler)
 {
@@ -510,6 +568,80 @@ void  CDXView::CDX::transformBone(const Ogre::String& modelBoneName, Ogre::Euler
 }
 */
 
+
+bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
+{
+
+	if (m_entity && !m_First)
+	{
+
+		if (m_kinectHelper.initialized())
+		{
+
+			for (int i = 0; i < m_kinectHelper.m_boneMapping.size(); i++)
+			{
+
+				int index = m_kinectHelper.m_boneMapping[i].boneIndex;
+
+
+				if (index >= 0)
+				{
+					//get skeleton bone
+					Ogre::String& boneName = *m_BoneNames[index];
+					Ogre::Skeleton* skel = m_entity->getSkeleton();
+					Ogre::Bone* bone = skel->getBone(boneName);
+					
+					//get kinect orient
+					Ogre::Quaternion kinectOri = m_kinectHelper.m_boneMapping[i].ori;
+					Ogre::Quaternion ori = kinectOri;
+
+
+					//adjust the orientation
+					Ogre::Quaternion rot;
+					rot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
+					ori = rot * ori;
+
+					m_BoneQuats[index] = ori;
+
+					
+					//draw debug lines
+					
+					Ogre::Vector3 bonePos= bone->convertLocalToWorldPosition(Ogre::Vector3(0.0, 0.0, 0.0));					
+					Ogre::Vector3 ax;
+					Ogre::Vector3 ay;
+					Ogre::Vector3 az;
+					ori.ToAxes(ax, ay, az);
+					ax.normalise();
+					ay.normalise();
+					az.normalise();
+					bonePos = bonePos + Ogre::Vector3(1.2, 0.0, 0.0);
+					ax = bonePos + ax*0.4f;
+					ay = bonePos + ay*0.4f;
+					az = bonePos + az*0.4f;
+
+
+					DebugDrawer::getSingleton().drawLine(bonePos, ax, Ogre::ColourValue::Red);
+					DebugDrawer::getSingleton().drawLine(bonePos, ay, Ogre::ColourValue::Green);
+					DebugDrawer::getSingleton().drawLine(bonePos, az, Ogre::ColourValue::Blue);
+
+				}
+			}
+		}
+	}
+	
+	m_entity->setVisible(true);
+	
+	DebugDrawer::getSingleton().build();
+	return true;
+}
+
+bool CDXView::CDX::frameEnded(const Ogre::FrameEvent& evt)
+{
+	DebugDrawer::getSingleton().clear();
+	return true;
+}
+
+
 bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
 	
@@ -531,11 +663,39 @@ bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 				if (index >= 0)
 				{
 					Ogre::String& boneName = *m_BoneNames[index];
-					Ogre::Euler euler(m_kinectHelper.m_boneMapping[i].ori);
+					//Ogre::Euler euler(m_kinectHelper.m_boneMapping[i].ori);
+					Ogre::Quaternion quat = m_BoneQuats[index];
 
-					transformBone(boneName, euler);
-					//eulers[index] = euler;
 
+					transformBone2(boneName, quat, false);
+
+					/*
+					if (index == VisualSceneNode12)
+					{
+
+						transformBone2(boneName, quat, false);
+
+					}
+					else if (index == VisualSceneNode62)
+					{
+						
+						
+						Ogre::Vector3 ax(0.0, 0.0, 1.0);
+						Ogre::Vector3 ay(0.0, -1.0, 0.0);
+						Ogre::Vector3 az(1.0, 0.0, 0.0);
+						Ogre::Quaternion base;
+						base.FromAxes(ax, ay, ax);
+						quat = base.Inverse()* quat;
+
+
+						transformBone2(boneName, quat, false);
+
+					}
+					else
+					*/
+
+
+					
 				}
 
 			}
@@ -587,6 +747,7 @@ int CDXView::CDX::OnCreate(LPCREATESTRUCT pcs)
 	else
 		TRACE("Failed to initialize DirectX\n");
 	
+	InitResources();
 
 	// initialize kinect 
 
@@ -604,6 +765,9 @@ int CDXView::CDX::OnCreate(LPCREATESTRUCT pcs)
 void CDXView::CDX::OnDestroy()
 {
 
+
+	delete DebugDrawer::getSingletonPtr();
+
 	for (int i = 0; i < m_BoneNames.size(); i++)
 	{
 		delete m_BoneNames[i];
@@ -611,7 +775,7 @@ void CDXView::CDX::OnDestroy()
 
 	m_BoneNames.clear();
 	m_BoneEulers.clear();
-
+	m_BoneQuats.clear();
 	m_kinectHelper.destroyKinect();
 
 
@@ -699,6 +863,14 @@ HRESULT CDXView::CDX::InitResources()
 	return S_OK;
 }
 
+
+void CDXView::OnDraw(CDC& dc)
+// OnDraw is called when part or all of the window needs to be redrawn
+{
+	
+
+}
+
 void CDXView::CDX::Render()
 // Draws the scene.
 {
@@ -708,7 +880,6 @@ void CDXView::CDX::Render()
 		if (m_First)
 		{
 
-			InitResources();
 			InitGeometry();
 
 		}

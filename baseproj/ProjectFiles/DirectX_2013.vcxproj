@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\debugdrawer.cpp" />
     <ClCompile Include="..\src\DXApp.cpp" />
     <ClCompile Include="..\src\kinecthelper.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -75,6 +76,7 @@
     <ClInclude Include="..\..\include\wincxx\wxx_webbrowser.h" />
     <ClInclude Include="..\..\include\wincxx\wxx_wincore.h" />
     <ClInclude Include="..\..\include\wincxx\wxx_winutils.h" />
+    <ClInclude Include="..\src\debugdrawer.h" />
     <ClInclude Include="..\src\DXApp.h" />
     <ClInclude Include="..\src\kinecthelper.h" />
     <ClInclude Include="..\src\Mainfrm.h" />

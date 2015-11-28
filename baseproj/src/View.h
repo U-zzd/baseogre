@@ -6,6 +6,7 @@
 #include "Ogre.h"
 #include "ogreeuler.h"
 #include "kinecthelper.h"
+#include "debugdrawer.h"
 
 // NOTE: for MS compilers you will need the DirectX SDK v9
 //       for Dev-C++ you will need the DirecX v9.0c DevPak
@@ -49,7 +50,10 @@ class CDXView : public CWnd
 		virtual void PreCreate(CREATESTRUCT &cs);
 		virtual LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 		// Ogre::FrameListener
+		virtual bool frameStarted(const Ogre::FrameEvent& evt);
 		virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+		virtual bool frameEnded(const Ogre::FrameEvent& evt);
+
 
 			
 		void setupAnimations();
@@ -57,7 +61,8 @@ class CDXView : public CWnd
 		void setupBone2(const Ogre::String& name, const Ogre::Quaternion& q);
 
 		void transformBone(const Ogre::String& modelBoneName, Ogre::Euler& euler);
-	
+		void  transformBone2(const Ogre::String& modelBoneName, Ogre::Quaternion& q, bool flip);
+
 	private:
 	
 		bool m_First;
@@ -67,8 +72,10 @@ class CDXView : public CWnd
 		Ogre::Euler m_boneOrients[18];
 		std::vector<Ogre::String*> m_BoneNames;
 		std::vector<Ogre::Euler> m_BoneEulers;
+		std::vector<Ogre::Quaternion> m_BoneQuats;
 
 		KinectHelper m_kinectHelper;
+		DebugDrawer* m_debugDrawer;
 
 		Ogre::Camera*m_Camera;
 		Ogre::RenderWindow*m_RenderWindow;
@@ -99,12 +106,12 @@ public:
 	virtual ~CDXView();
 
 	CDX& GetDX() const { return const_cast<CDX&>(m_DX); }
-
+	
 protected:
 	virtual int OnCreate(LPCREATESTRUCT pcs);
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+	virtual void OnDraw(CDC& dc);
 private:
 	CDX m_DX;
 	CDXThread m_DXThread;
