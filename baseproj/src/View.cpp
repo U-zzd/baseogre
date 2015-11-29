@@ -12,7 +12,7 @@
 #include <OgreConfigFile.h>
 #include <OgreGLRenderSystem.h>
 
-#define USEKINECT (0)
+#define USEKINECT (1)
 
 
 enum ModesVisualBones
@@ -252,7 +252,8 @@ void CDXView::CDX::setupAnimations()
 
 
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
-	m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode62);
+	m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode41);
+	//m_kinectHelper.setBoneMapping(JointType_WristRight, VisualSceneNode43);
 	/*
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
 	m_kinectHelper.setBoneMapping(JointType_SpineShoulder, VisualSceneNode37);
@@ -279,12 +280,12 @@ void CDXView::CDX::setupAnimations()
 		m_BoneTracked.push_back(false);
 	}
 
-	m_BoneTracked[VisualSceneNode15] = true;
-	m_BoneTracked[VisualSceneNode36] = true;
-	m_BoneTracked[VisualSceneNode17] = true;
+	//m_BoneTracked[VisualSceneNode15] = true;
+	//m_BoneTracked[VisualSceneNode36] = true;
+	//m_BoneTracked[VisualSceneNode17] = true;
 	m_BoneTracked[VisualSceneNode41] = true;
-	m_BoneTracked[VisualSceneNode62] = true;
-	m_BoneTracked[VisualSceneNode43] = true;
+	//m_BoneTracked[VisualSceneNode62] = true;
+	//m_BoneTracked[VisualSceneNode43] = true;
 	m_BoneTracked[VisualSceneNode12] = true;
 
 
@@ -463,6 +464,7 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 #if (USEKINECT)
 					///get orient kinect	
 					Ogre::Quaternion kinectOri = Ogre::Quaternion::IDENTITY;
+					Ogre::Quaternion adjusted = kinectOri;
 
 					if (m_kinectHelper.initialized())
 					{
@@ -473,22 +475,63 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 							{
 
 								kinectOri = m_kinectHelper.m_boneMapping[j].ori;
+
+								adjusted = kinectOri;
+
+								//rotate 180 around y (camera space)
+								Ogre::Quaternion yrot;
+								yrot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
+								
+								adjusted = yrot*adjusted;
+
+							
+								if (j == JointType_ElbowRight)
+								{
+									Ogre::Vector3 ax;
+									Ogre::Vector3 ay;
+									Ogre::Vector3 az;
+									Ogre::Vector3 ax2;
+									Ogre::Vector3 ay2;
+									Ogre::Vector3 az2;									
+									Ogre::Quaternion base;
+									
+									adjusted.ToAxes(ax, ay, az);																		
+									ax2 = ax;
+									ay2 = az;
+									az2 = ay*-1;
+									adjusted.FromAxes(ax2, ay2, az2);
+									ax = Ogre::Vector3(0.0, 0.0, -1.0);
+									ay = Ogre::Vector3(-1.0, 0.0, 0.0);
+									az = Ogre::Vector3(0.0, 1.0, 0.0);
+									base.FromAxes(ax, ay, az);
+									adjusted = base.Inverse()*  adjusted;
+
+									
+								}
+
+
+
+							
+
 							}
 						}
 					}
 
+					
+
+
 #else
 					//get manual orien 
 					Ogre::Quaternion kinectOri = m_BoneEulers[i].toQuaternion();
-
+					Ogre::Quaternion adjusted = kinectOri;
 #endif
 
-					Ogre::Quaternion adjusted = kinectOri;
+					
 					Ogre::Quaternion finalquat = calculateBoneTransform(boneName, adjusted);
 					m_BoneQuats[i] = finalquat;
 
 
-					Ogre::Quaternion debugQuat = qC;
+					Ogre::Quaternion debugQuat = finalquat;
 
 
 
@@ -502,15 +545,45 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 					ax.normalise();
 					ay.normalise();
 					az.normalise();
+
+					bool xback = ax.z < 0;
+					bool yback = ay.z < 0;
+					bool zback = az.z < 0;
+
 					bonePos = bonePos + Ogre::Vector3(0.0, 0.0, 0.5);
 					ax = bonePos + ax*0.2f;
 					ay = bonePos + ay*0.2f;
 					az = bonePos + az*0.2f;
 
+					
+					Ogre::ColourValue clr = Ogre::ColourValue::Red;
+					if (xback)
+					{
+						clr.r = clr.r* 0.6;
+						clr.g = clr.g* 0.6;
+						clr.b = clr.b* 0.6;
+					}
 
-					DebugDrawer::getSingleton().drawLine(bonePos, ax, Ogre::ColourValue::Red);
-					DebugDrawer::getSingleton().drawLine(bonePos, ay, Ogre::ColourValue::Green);
-					DebugDrawer::getSingleton().drawLine(bonePos, az, Ogre::ColourValue::White);
+					DebugDrawer::getSingleton().drawLine(bonePos, ax, clr);
+
+					clr = Ogre::ColourValue::Green;
+					if (yback)
+					{
+						clr.r = clr.r* 0.6;
+						clr.g = clr.g* 0.6;
+						clr.b = clr.b* 0.6;
+					}
+					DebugDrawer::getSingleton().drawLine(bonePos, ay, clr);
+
+					clr = Ogre::ColourValue::White;
+					if (zback)
+					{
+						clr.r = clr.r* 0.6;
+						clr.g = clr.g* 0.6;
+						clr.b = clr.b* 0.6;
+					}
+
+					DebugDrawer::getSingleton().drawLine(bonePos, az, clr);
 
 
 				}
