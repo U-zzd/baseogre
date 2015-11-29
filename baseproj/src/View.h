@@ -30,7 +30,7 @@
 class CDXView : public CWnd
 {
 	// CDX nested class within CDXView
-	class CDX : public CWnd , public Ogre::FrameListener
+	class CDX : public CWnd, public Ogre::FrameListener
 	{
 	public:
 		CDX();
@@ -50,32 +50,36 @@ class CDXView : public CWnd
 		virtual void PreCreate(CREATESTRUCT &cs);
 		virtual LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 		// Ogre::FrameListener
+
 		virtual bool frameStarted(const Ogre::FrameEvent& evt);
 		virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 		virtual bool frameEnded(const Ogre::FrameEvent& evt);
 
-
-			
 		void setupAnimations();
 		void setupBone(const Ogre::String& name, const Ogre::Quaternion& q);
 		void setupBone2(const Ogre::String& name, const Ogre::Quaternion& q);
 
-		void transformBone(const Ogre::String& modelBoneName, Ogre::Euler& euler);
-		void  transformBone2(const Ogre::String& modelBoneName, Ogre::Quaternion& q, bool flip);
+
+		void  applyBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
+		Ogre::Quaternion calculateBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
+
+
 
 	private:
-	
+
 		bool m_First;
-	
+
 		int m_boneIndex;
 		bool m_mouseDown;
+		bool m_centerDown;
 		Ogre::Euler m_boneOrients[18];
 		std::vector<Ogre::String*> m_BoneNames;
 		std::vector<Ogre::Euler> m_BoneEulers;
 		std::vector<Ogre::Quaternion> m_BoneQuats;
+		std::vector<bool> m_BoneTracked;
+
 
 		KinectHelper m_kinectHelper;
-		DebugDrawer* m_debugDrawer;
 
 		Ogre::Camera*m_Camera;
 		Ogre::RenderWindow*m_RenderWindow;
@@ -83,7 +87,7 @@ class CDXView : public CWnd
 		//Ogre::AnimationState* mAnimationState;
 		Ogre::Entity *m_entity;
 	};
-	
+
 	// CDXThread nested class within CDXView
 	class CDXThread : public CWinThread
 	{
@@ -95,7 +99,7 @@ class CDXView : public CWnd
 		virtual int MessageLoop();
 
 	private:
-	
+
 		CDX* m_pDX;		// OGre window
 
 
@@ -106,12 +110,12 @@ public:
 	virtual ~CDXView();
 
 	CDX& GetDX() const { return const_cast<CDX&>(m_DX); }
-	
+
 protected:
 	virtual int OnCreate(LPCREATESTRUCT pcs);
 	virtual LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual LRESULT WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual void OnDraw(CDC& dc);
+
 private:
 	CDX m_DX;
 	CDXThread m_DXThread;
