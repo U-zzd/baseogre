@@ -30,7 +30,7 @@
 class CDXView : public CWnd
 {
 	// CDX nested class within CDXView
-	class CDX : public CWnd, public Ogre::FrameListener
+	class CDX : public CWnd , public Ogre::FrameListener
 	{
 	public:
 		CDX();
@@ -59,16 +59,16 @@ class CDXView : public CWnd
 		void setupBone(const Ogre::String& name, const Ogre::Quaternion& q);
 		void setupBone2(const Ogre::String& name, const Ogre::Quaternion& q);
 
-
+		
 		void  applyBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
 		Ogre::Quaternion calculateBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
 
 
 
 	private:
-
+	
 		bool m_First;
-
+		int mDrawOrient;
 		int m_boneIndex;
 		bool m_mouseDown;
 		bool m_centerDown;
@@ -87,7 +87,7 @@ class CDXView : public CWnd
 		//Ogre::AnimationState* mAnimationState;
 		Ogre::Entity *m_entity;
 	};
-
+	
 	// CDXThread nested class within CDXView
 	class CDXThread : public CWinThread
 	{
@@ -99,7 +99,7 @@ class CDXView : public CWnd
 		virtual int MessageLoop();
 
 	private:
-
+	
 		CDX* m_pDX;		// OGre window
 
 

@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "DXApp.h"
 
+WAITABLE_HANDLE hColorWaitable;
+
 bool KinectHelper::initKinect()
 {
 
 	HRESULT hr;
-
+	hColorWaitable = 0;
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
 
 	//KinectSensor::GetDefault();
@@ -32,11 +34,24 @@ bool KinectHelper::initKinect()
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
-		}
 
-		if (SUCCEEDED(hr))
-		{
-			hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
+			if (SUCCEEDED(hr))
+			{
+				hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
+				
+				if (SUCCEEDED(hr))
+				{
+					hr = pBodyFrameSource->SubscribeFrameCaptured(&hColorWaitable);
+					if (FAILED(hr)){
+
+						TRACE("Failed to initialize DirectX\n");
+					}
+
+				}
+
+
+			}
+
 		}
 
 		SafeRelease(pBodyFrameSource);
@@ -111,6 +126,18 @@ void KinectHelper::update()
 		return;
 	}
 
+
+	//wait for frame 2sec time out
+	HANDLE hEvents[] = { reinterpret_cast<HANDLE>(hColorWaitable) };
+	DWORD  res = WaitForMultipleObjects(ARRAYSIZE(hEvents), hEvents, true, 2000);
+	
+	if (res == WAIT_TIMEOUT)
+	{
+	
+		return;  
+	}
+
+
 	IBodyFrame* pBodyFrame = NULL;
 
 	HRESULT hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
@@ -130,7 +157,7 @@ void KinectHelper::update()
 
 		if (SUCCEEDED(hr))
 		{
-			processBody(1, ppBodies);
+			processBody(BODY_COUNT, ppBodies);
 		}
 
 		for (int i = 0; i < _countof(ppBodies); ++i)
@@ -159,7 +186,7 @@ void KinectHelper::processBody(int nBodyCount, IBody** ppBodies)
 
 			if (SUCCEEDED(hr) && bTracked)
 			{
-				Joint joints[JointType_Count];
+			//	Joint joints[JointType_Count];
 				JointOrientation oriens[JointType_Count];
 
 				//HandState leftHandState = HandState_Unknown;
@@ -168,38 +195,41 @@ void KinectHelper::processBody(int nBodyCount, IBody** ppBodies)
 				// pBody->get_HandLeftState(&leftHandState);
 				// pBody->get_HandRightState(&rightHandState);
 
-				hr = pBody->GetJoints(_countof(joints), joints);
+				//hr = pBody->GetJoints(_countof(joints), joints);
 		
+				//if (SUCCEEDED(hr))
+				//{
+				hr = pBody->GetJointOrientations(_countof(oriens), oriens);
+
 				if (SUCCEEDED(hr))
 				{
-					hr = pBody->GetJointOrientations(_countof(joints), oriens);
 
-					if (SUCCEEDED(hr))
-					{
+					for (int j = 0; j < _countof(oriens); ++j)
+					{ 
 
-						for (int j = 0; j < _countof(joints); ++j)
-						{ 
+						Ogre::Quaternion ori = Ogre::Quaternion(
+							oriens[j].Orientation.w,
+							oriens[j].Orientation.x,
+							oriens[j].Orientation.y,
+							oriens[j].Orientation.z);
 
-							Ogre::Quaternion ori = Ogre::Quaternion(
-								oriens[j].Orientation.w,
-								oriens[j].Orientation.x,
-								oriens[j].Orientation.y,
-								oriens[j].Orientation.z);
-
-							Ogre::Vector3 vec = Ogre::Vector3(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z);
+					//	Ogre::Vector3 vec = Ogre::Vector3(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z);
 
 
-							m_boneMapping[j].pos = vec;
-							m_boneMapping[j].ori = ori;
-
-						}
-
+//							m_boneMapping[j].pos = vec;
+						m_boneMapping[j].ori = ori;
 						m_lastFrameOk = true;
-
 					}
+
+				
+
 				}
+				//}
 			}
 		}
+
+		if (m_lastFrameOk)
+			break;
 	}
 
 			

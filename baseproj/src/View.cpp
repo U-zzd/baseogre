@@ -94,7 +94,7 @@ CDXView::CDX::CDX() : m_Camera(NULL), m_RenderWindow(NULL), m_First(true), m_ogr
 {
 	m_mouseDown = false;
 	m_centerDown = false;
-
+	mDrawOrient = 0;
 	m_boneIndex = 0;
 	m_entity = NULL;
 
@@ -253,7 +253,7 @@ void CDXView::CDX::setupAnimations()
 
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
 	m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode41);
-	//m_kinectHelper.setBoneMapping(JointType_WristRight, VisualSceneNode43);
+	//m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode62);
 	/*
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
 	m_kinectHelper.setBoneMapping(JointType_SpineShoulder, VisualSceneNode37);
@@ -280,13 +280,19 @@ void CDXView::CDX::setupAnimations()
 		m_BoneTracked.push_back(false);
 	}
 
-	//m_BoneTracked[VisualSceneNode15] = true;
-	//m_BoneTracked[VisualSceneNode36] = true;
-	//m_BoneTracked[VisualSceneNode17] = true;
+	/*
+	m_BoneTracked[VisualSceneNode15] = true;
+	m_BoneTracked[VisualSceneNode36] = true;
+	m_BoneTracked[VisualSceneNode17] = true;
 	m_BoneTracked[VisualSceneNode41] = true;
-	//m_BoneTracked[VisualSceneNode62] = true;
-	//m_BoneTracked[VisualSceneNode43] = true;
+	m_BoneTracked[VisualSceneNode62] = true;
+	m_BoneTracked[VisualSceneNode43] = true;
 	m_BoneTracked[VisualSceneNode12] = true;
+	*/
+
+	m_BoneTracked[VisualSceneNode41] = true;
+	m_BoneTracked[VisualSceneNode12] = true;
+
 
 
 
@@ -440,6 +446,13 @@ void  CDXView::CDX::applyBoneTransform(const Ogre::String& modelBoneName, Ogre::
 bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 {
 
+	Ogre::Vector3 kax;
+	Ogre::Vector3 kay;
+	Ogre::Vector3 kaz;
+	Ogre::Vector3 ax;
+	Ogre::Vector3 ay;
+	Ogre::Vector3 az;
+
 	if (m_entity && !m_First)
 	{
 
@@ -451,21 +464,23 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 				if (m_BoneTracked[i])
 				{
 
+				
 					Ogre::String& boneName = *m_BoneNames[i];
 					Ogre::Skeleton* skel = m_entity->getSkeleton();
 					Ogre::Bone* bone = skel->getBone(boneName);
 
+					/*
 					Ogre::Quaternion qI = bone->getInitialOrientation();
 					Ogre::Quaternion qC = bone->getOrientation();
+					*/
 
 
-
-
-#if (USEKINECT)
-					///get orient kinect	
 					Ogre::Quaternion kinectOri = Ogre::Quaternion::IDENTITY;
 					Ogre::Quaternion adjusted = kinectOri;
 
+#if (USEKINECT)
+					///get orient kinect	
+				
 					if (m_kinectHelper.initialized())
 					{
 
@@ -475,87 +490,161 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 							{
 
 								kinectOri = m_kinectHelper.m_boneMapping[j].ori;
-
 								adjusted = kinectOri;
 
+
 								//rotate 180 around y (camera space)
+								
 								Ogre::Quaternion yrot;
 								yrot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
+								kinectOri = yrot* adjusted;
+								adjusted = kinectOri;
 								
-								adjusted = yrot*adjusted;
+								
+								if (j == JointType_SpineMid)
+								{
+								
+									Ogre::Quaternion base;
+									Ogre::Quaternion kbase;
 
-							
+									kax = Ogre::Vector3(1.0, 0.0, 0.0);
+									kay = Ogre::Vector3(0.0, 1.0, 0.0);
+									kaz = Ogre::Vector3(0.0, 0.0, 1.0);
+
+									ax = Ogre::Vector3(1.0, 0.0, 0.0);
+									ay = Ogre::Vector3(0.0, 1.0, 0.0);
+									az = Ogre::Vector3(0.0, 0.0, 1.0);
+
+									base.FromAxes(ax, ay, az);
+									kbase.FromAxes(kax, kay, kaz);
+
+
+									//quaternion translate to target base
+									kbase = kbase.Inverse()  *base;
+									adjusted = adjusted.Inverse() * kbase;
+
+									//quaternion calculate delta
+									adjusted = adjusted.Inverse() * base;
+
+
+
+
+								}
+								else
 								if (j == JointType_ElbowRight)
 								{
-									Ogre::Vector3 ax;
-									Ogre::Vector3 ay;
-									Ogre::Vector3 az;
-									Ogre::Vector3 ax2;
-									Ogre::Vector3 ay2;
-									Ogre::Vector3 az2;									
 									Ogre::Quaternion base;
-									
-									adjusted.ToAxes(ax, ay, az);																		
-									ax2 = ax;
-									ay2 = az;
-									az2 = ay*-1;
-									adjusted.FromAxes(ax2, ay2, az2);
+									Ogre::Quaternion kbase;
+
+									kax = Ogre::Vector3(0.0, 0.0, -1.0);
+									kay = Ogre::Vector3(0.0, -1.0, 0.0);
+									kaz = Ogre::Vector3(-1.0, 0.0, 0.0);
+
 									ax = Ogre::Vector3(0.0, 0.0, -1.0);
 									ay = Ogre::Vector3(-1.0, 0.0, 0.0);
 									az = Ogre::Vector3(0.0, 1.0, 0.0);
+
 									base.FromAxes(ax, ay, az);
-									adjusted = base.Inverse()*  adjusted;
+									kbase.FromAxes(kax, kay, kaz);
 
-									
+									/*
+									//quaternion translate to target base
+									kbase = kbaseI  * base;
+									adjusted = adjusted* kbase;
+
+									//quaternion calculate delta
+									adjusted = adjusted.Inverse() * base;
+									*/
+
+									//quaternion translate to target base
+									kbase = kbase.Inverse()  * base;
+									adjusted = adjusted.Inverse() * kbase;
+
+									//quaternion calculate delta
+									adjusted = adjusted.Inverse() * base;
+
+
+
+
+
+
+
+									//Ogre::Vector3 ax;
+									//Ogre::Vector3 ay;
+									//Ogre::Vector3 az;
+									//Ogre::Vector3 ax2;
+									//Ogre::Vector3 ay2;
+									//Ogre::Vector3 az2;									
+									//Ogre::Quaternion base;
+									//
+									//adjusted.ToAxes(ax, ay, az);																		
+									//ax2 = ax;
+									//ay2 = az;
+									//az2 = ay*-1;
+									//adjusted.FromAxes(ax2, ay2, az2);
+									//
+									//ax = Ogre::Vector3(0.0, 0.0, -1.0);
+									//ay = Ogre::Vector3(-1.0, 0.0, 0.0);
+									//az = Ogre::Vector3(0.0, 1.0, 0.0);
+									//base.FromAxes(ax, ay, az);
+									//adjusted = base.Inverse()*  adjusted;
+									//
+
+
 								}
-
-
-
-							
+								
 
 							}
 						}
 					}
 
-					
+
 
 
 #else
 					//get manual orien 
-					Ogre::Quaternion kinectOri = m_BoneEulers[i].toQuaternion();
-					Ogre::Quaternion adjusted = kinectOri;
+					kinectOri = m_BoneEulers[i].toQuaternion();
+					adjusted = kinectOri;
 #endif
 
-					
-					Ogre::Quaternion finalquat = calculateBoneTransform(boneName, adjusted);
-					m_BoneQuats[i] = finalquat;
+					m_BoneQuats[i] = calculateBoneTransform(boneName, adjusted);
+					Ogre::Quaternion& debugQuat= m_BoneQuats[i];
+															
+					if (mDrawOrient == 1) //kinect raw orient
+					{
+						debugQuat = kinectOri;
+						
+					}
+					else if (mDrawOrient == 2) //model current orient
+					{
+						debugQuat = bone->getOrientation();
+					}
+					else if (mDrawOrient == 3)  //model base orient
+					{
 
-
-					Ogre::Quaternion debugQuat = finalquat;
-
+						debugQuat = bone->getInitialOrientation();
+					}
 
 
 					//draw debug lines
-
 					Ogre::Vector3 bonePos = bone->convertLocalToWorldPosition(Ogre::Vector3(0.0, 0.0, 0.0));
-					Ogre::Vector3 ax;
-					Ogre::Vector3 ay;
-					Ogre::Vector3 az;
+					bool xback = ax.z < 0;
+					bool yback = ay.z < 0;
+					bool zback = az.z < 0;
+
 					debugQuat.ToAxes(ax, ay, az);
 					ax.normalise();
 					ay.normalise();
 					az.normalise();
 
-					bool xback = ax.z < 0;
-					bool yback = ay.z < 0;
-					bool zback = az.z < 0;
+					
 
 					bonePos = bonePos + Ogre::Vector3(0.0, 0.0, 0.5);
 					ax = bonePos + ax*0.2f;
 					ay = bonePos + ay*0.2f;
 					az = bonePos + az*0.2f;
 
-					
+
 					Ogre::ColourValue clr = Ogre::ColourValue::Red;
 					if (xback)
 					{
@@ -585,6 +674,8 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 
 					DebugDrawer::getSingleton().drawLine(bonePos, az, clr);
 
+
+					
 
 				}
 			}
@@ -777,12 +868,15 @@ HRESULT CDXView::CDX::InitResources()
 void CDXView::CDX::Render()
 // Draws the scene.
 {
+	int mFramesPerSecond; // say 60
+	Ogre::Real mRenderTimeSlice; // 1000 / mFramesPerSecond
+
 	if (IsWindow() && m_RenderWindow)
 	{
 		Ogre::Root* root = m_ogreRoot;
 		if (m_First)
 		{
-
+			SetFocus();
 			m_RenderWindow->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
 
 
@@ -799,9 +893,7 @@ void CDXView::CDX::Render()
 		}
 #endif
 
-
 		root->renderOneFrame();
-
 
 
 	}
@@ -924,7 +1016,33 @@ LRESULT CDXView::CDX::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 
 	}
+	break;
+	case  WM_KEYUP:
+	{
 
+
+		char c = MapVirtualKey(wParam, MAPVK_VK_TO_CHAR);
+
+		if (c == '1')
+		{
+			mDrawOrient = 0;
+		}
+		else if (c == '2')
+		{
+			mDrawOrient = 1;
+		}
+		else if (c == '3')
+		{
+			mDrawOrient = 2;
+		}
+		else if (c == '4')
+		{
+			mDrawOrient = 2;
+		}
+
+
+	}
+	break;
 	break;
 
 	}

@@ -161,6 +161,7 @@
     <EmbedManifest>false</EmbedManifest>
     <IncludePath>$(VC_IncludePath);$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)..\..\bin\debugx64\</OutDir>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSdk_71A_LibraryPath_x64);$(KINECTSDK20_DIR)\lib\x64;</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_64|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -218,13 +219,14 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;INCLUDE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx;$(ProjectDir)\..\..\include\OIS;$(ProjectDir)\..\..\boost;$(ProjectDir)\..\..\include\OGRE;$(ProjectDir)\..\..\include\OGRE\RenderSystems\GL;$(ProjectDir)\..\..\include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(SolutionDir)..\..\bin\debugx64\vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
-      <AdditionalOptions> -fPIC</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateManifest>false</GenerateManifest>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comctl32.lib;Winmm.lib;..\..\libx64\Debug\OgreMain_d.lib;..\..\boost\libx64\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\libx64\Debug\OgreRTShaderSystem_d.lib;..\..\libx64\Debug\OgreTerrain_d.lib;..\..\libx64\Debug\OgrePaging_d.lib;..\..\libx64\Debug\OgreVolume_d.lib;..\..\libx64\Debug\OgreOverlay_d.lib;..\..\libx64\Debug\opt\RenderSystem_GL_d.lib;..\..\libx64\Debug\OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comctl32.lib;Winmm.lib;kinect20.lib;..\..\libx64\Debug\OgreMain_d.lib;..\..\boost\libx64\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\libx64\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\libx64\Debug\OgreRTShaderSystem_d.lib;..\..\libx64\Debug\OgreTerrain_d.lib;..\..\libx64\Debug\OgrePaging_d.lib;..\..\libx64\Debug\OgreVolume_d.lib;..\..\libx64\Debug\OgreOverlay_d.lib;..\..\libx64\Debug\opt\RenderSystem_GL_d.lib;..\..\libx64\Debug\OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx</AdditionalIncludeDirectories>
