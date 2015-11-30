@@ -60,8 +60,10 @@ class CDXView : public CWnd
 		void setupBone2(const Ogre::String& name, const Ogre::Quaternion& q);
 
 		
-		void  applyBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
-		Ogre::Quaternion calculateBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q);
+		//q is the absolute  orientation  
+		//internally this method should first retrieve the parent bone and substract the parent orientation
+		void  applyBoneTransform(int boneIndex, Ogre::Quaternion& q);
+		Ogre::Quaternion calculateBoneTransform(int boneIndex,  Ogre::Quaternion& q);
 
 
 
@@ -77,6 +79,7 @@ class CDXView : public CWnd
 		std::vector<Ogre::String*> m_BoneNames;
 		std::vector<Ogre::Euler> m_BoneEulers;
 		std::vector<Ogre::Quaternion> m_BoneQuats;
+		
 		std::vector<bool> m_BoneTracked;
 
 

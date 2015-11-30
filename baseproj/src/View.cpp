@@ -253,6 +253,12 @@ void CDXView::CDX::setupAnimations()
 
 	m_kinectHelper.setBoneMapping(JointType_SpineMid, VisualSceneNode12);
 	m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode41);
+	m_kinectHelper.setBoneMapping(JointType_WristRight, VisualSceneNode43);
+	m_kinectHelper.setBoneMapping(JointType_ElbowLeft, VisualSceneNode15);
+	m_kinectHelper.setBoneMapping(JointType_WristLeft, VisualSceneNode17);
+	
+	//m_kinectHelper.setBoneMapping(JointType_Head, VisualSceneNode38);
+		//m_kinectHelper.setBoneMapping(JointType_Head, VisualSceneNode39);
 	//m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode41);
 	//m_kinectHelper.setBoneMapping(JointType_ElbowRight, VisualSceneNode62);
 	/*
@@ -293,8 +299,12 @@ void CDXView::CDX::setupAnimations()
 
 	m_BoneTracked[VisualSceneNode41] = true;
 	m_BoneTracked[VisualSceneNode12] = true;
+	m_BoneTracked[VisualSceneNode43] = true;
+	m_BoneTracked[VisualSceneNode15] = true;
+	m_BoneTracked[VisualSceneNode17] = true;
 
-
+	//m_BoneTracked[VisualSceneNode38] = true;
+	//m_BoneTracked[VisualSceneNode39] = true;
 
 
 	Ogre::AnimationStateSet* animations = m_entity->getAllAnimationStates();
@@ -419,25 +429,36 @@ void CDXView::CDX::setupBone(const Ogre::String& name, const Ogre::Quaternion& q
 
 }
 
+//assuming parent bone was calculated first
 
-Ogre::Quaternion CDXView::CDX::calculateBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q)
+Ogre::Quaternion CDXView::CDX::calculateBoneTransform(int boneIndex,  Ogre::Quaternion& q)
 {
-
+	Ogre::String& modelBoneName = *m_BoneNames[boneIndex];
 	Ogre::Skeleton* skel = m_entity->getSkeleton();
-	Ogre::Bone* bone = skel->getBone(modelBoneName);
+	Ogre::Bone* bone = skel->getBone(modelBoneName);	
 	Ogre::Quaternion qI = bone->getInitialOrientation();
 	Ogre::Quaternion newQ = Ogre::Quaternion::IDENTITY;
 
 	newQ = q * qI;
 
+	  
+
+
+	
+
 	return newQ;
 
 }
 
-void  CDXView::CDX::applyBoneTransform(const Ogre::String& modelBoneName, Ogre::Quaternion& q)
+void  CDXView::CDX::applyBoneTransform(int boneIndex,  Ogre::Quaternion& q)
 {
+	Ogre::String& modelBoneName = *m_BoneNames[boneIndex];
 	Ogre::Skeleton* skel = m_entity->getSkeleton();
 	Ogre::Bone* bone = skel->getBone(modelBoneName);
+
+	
+
+
 	bone->setOrientation(q);
 
 }
@@ -453,6 +474,9 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 	Ogre::Vector3 ax;
 	Ogre::Vector3 ay;
 	Ogre::Vector3 az;
+	Ogre::Quaternion yrot;
+	yrot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
+
 
 	if (m_entity && !m_First)
 	{
@@ -496,8 +520,6 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 
 								//rotate 180 around y (camera space)
 								
-								Ogre::Quaternion yrot;
-								yrot.FromAngleAxis(Ogre::Degree(180.0), Ogre::Vector3(0.0, 1.0, 0.0));
 								kinectOri = yrot* adjusted;
 								adjusted = kinectOri;
 								
@@ -544,20 +566,86 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 									Ogre::Euler euler(base);
 									Ogre::Euler euleradj;
 
-									euleradj.setYaw(Ogre::Radian(0.0));
-									
+									euleradj.setYaw(Ogre::Radian(0.0));									
 									euleradj.setPitch(euler.roll());
 									euleradj.setRoll(euler.pitch() + Ogre::Radian(3.1416/4.0));
 									adjusted = euleradj.toQuaternion();
 
 
-									int k = 0;
-									k++ ;
-
 									
 
 								}
-								
+								else if (j == JointType_WristRight)
+								{
+									Ogre::Quaternion base;
+									Ogre::Quaternion kbase;
+									//kinect wrist en reposo
+									kax = Ogre::Vector3(0.0, 0.0, -1.0);
+									kay = Ogre::Vector3(0.0, -1.0, 0.0);
+									kaz = Ogre::Vector3(-1.0, 0.0, 0.0);
+
+									kbase.FromAxes(kax, kay, kaz);
+									base = adjusted.Inverse()  * kbase;
+									Ogre::Euler euler(base);
+									Ogre::Euler euleradj;
+									euleradj.setPitch(euler.roll()); // -Ogre::Radian(3.1416 / 6.0));
+									euleradj.setYaw(-euler.pitch());// +Ogre::Radian(3.1416 / 6.0));									
+									euleradj.setRoll(Ogre::Radian(0.0));
+									adjusted = euleradj.toQuaternion();
+
+									
+								}
+								else if (j == JointType_ElbowLeft)
+								{
+									Ogre::Quaternion base;
+									Ogre::Quaternion kbase;
+
+									//kinect elbow en reposo
+									kax = Ogre::Vector3(0.0, 0.0, 1.0);
+									kay = Ogre::Vector3(0.0, -1.0, 0.0);
+									kaz = Ogre::Vector3(1.0, 0.0, 0.0);
+									kbase.FromAxes(kax, kay, kaz);
+									base = adjusted.Inverse()  * kbase;
+
+									Ogre::Euler euler(base);
+									Ogre::Euler euleradj;
+									euleradj.setYaw(Ogre::Radian(0));
+									euleradj.setPitch(-euler.roll());
+									euleradj.setRoll(-euler.pitch() - Ogre::Radian(3.1416 / 4.0));
+									
+									
+									adjusted = euleradj.toQuaternion();
+
+
+								}
+								else if (j == JointType_WristLeft)
+								{
+									Ogre::Quaternion base;
+									Ogre::Quaternion kbase;
+
+									//kinect elbow en reposo
+									kax = Ogre::Vector3(0.0, 0.0, 1.0);
+									kay = Ogre::Vector3(0.0, -1.0, 0.0);
+									kaz = Ogre::Vector3(1.0, 0.0, 0.0);
+									kbase.FromAxes(kax, kay, kaz);
+									base = adjusted.Inverse()  * kbase;
+
+
+									Ogre::Euler euler(base);
+									Ogre::Euler euleradj;
+									euleradj.setPitch(-euler.roll());
+									euleradj.setYaw(euler.pitch());
+									euleradj.setRoll(Ogre::Radian(0.0));
+
+									/*
+									euleradj.setPitch(-euler.roll());
+									euleradj.setYaw(Ogre::Radian(0.0));									
+									euleradj.setRoll(euler.pitch());
+									*/
+									adjusted = euleradj.toQuaternion();
+
+
+								}
 
 							}
 						}
@@ -572,7 +660,13 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 					adjusted = kinectOri;
 #endif
 
-					m_BoneQuats[i] = calculateBoneTransform(boneName, adjusted);
+
+					//m_BoneQuats[i] = calculateBoneTransform(i, adjusted);
+
+					m_BoneQuats[i] = adjusted; // calculateBoneTransform(i, adjusted);
+
+
+
 					Ogre::Quaternion debugQuat= m_BoneQuats[i];
 					
 					if (mDrawOrient == 0) //next model orient
@@ -683,9 +777,40 @@ bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 				if (m_BoneTracked[i])
 				{
 
-					Ogre::Quaternion quat = m_BoneQuats[i];
-					Ogre::String& boneName = *m_BoneNames[i];
-					applyBoneTransform(boneName, quat);
+					Ogre::Quaternion absolute = m_BoneQuats[i];
+					Ogre::Quaternion local;
+
+
+					if (i == VisualSceneNode41 || i == VisualSceneNode15)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode12];
+						local = absolute* parent.Inverse();
+
+					}
+					else if (i == VisualSceneNode43)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode41];
+
+						local = absolute* parent.Inverse();
+
+					}
+					else if (i == VisualSceneNode17)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode15];
+
+						local = absolute* parent.Inverse();
+
+					}
+					else
+					{
+						local = absolute;
+
+					}
+
+					Ogre::Quaternion final = calculateBoneTransform(i, local);
+
+
+					applyBoneTransform(i, final);
 				};
 
 			}
