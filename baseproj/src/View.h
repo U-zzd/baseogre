@@ -72,6 +72,7 @@ class CDXView : public CWnd
 		int m_boneIndex;
 		bool m_mouseDown;
 		bool m_centerDown;
+		bool m_showModel;
 		Ogre::Euler m_boneOrients[18];
 		std::vector<Ogre::String*> m_BoneNames;
 		std::vector<Ogre::Euler> m_BoneEulers;
