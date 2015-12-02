@@ -9,6 +9,10 @@
 
 #include "stdafx.h"
 #include "DXApp.h"
+
+#include "debugdrawer.h"
+
+
 #include <OgreConfigFile.h>
 #include <OgreGLRenderSystem.h>
 
@@ -98,6 +102,8 @@ CDXView::CDX::CDX() : m_Camera(NULL), m_RenderWindow(NULL), m_First(true), m_ogr
 	m_boneIndex = 0;
 	m_entity = NULL;
 	m_showModel = true; 
+	m_useFilter = false;
+
 }
 
 CDXView::CDX::~CDX()
@@ -153,7 +159,7 @@ HRESULT CDXView::CDX::InitOgre(HWND hWnd)
 	m_Camera->setCastShadows(false);
 	m_Camera->setUseRenderingDistance(true);
 	//	m_Camera->setPosition(Ogre::Vector3(200.0, 50.0, 100.0));
-	m_Camera->setPosition(Ogre::Vector3(0.0, 2.0, 5.0));
+	m_Camera->setPosition(Ogre::Vector3(0.0, 2.0, 6.0));
 
 	Ogre::SceneNode *CameraNode = NULL;
 	CameraNode = SceneManager->getRootSceneNode()->createChildSceneNode("CameraNode");
@@ -298,8 +304,10 @@ void CDXView::CDX::setupAnimations()
 	*/
 
 	m_BoneTracked[VisualSceneNode41] = true;
+
 	m_BoneTracked[VisualSceneNode12] = true;
 	m_BoneTracked[VisualSceneNode43] = true;
+
 	m_BoneTracked[VisualSceneNode15] = true;
 	m_BoneTracked[VisualSceneNode17] = true;
 
@@ -514,7 +522,13 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 							if (i == m_kinectHelper.m_boneMapping[j].boneIndex)
 							{
 
-								kinectOri = m_kinectHelper.m_boneMapping[j].ori;
+								if (m_useFilter)
+									kinectOri = m_kinectHelper.m_boneMappingFiltered[j].ori;
+								else								
+									kinectOri = m_kinectHelper.m_boneMapping[j].ori;
+								
+
+
 								adjusted = kinectOri;
 
 
@@ -661,6 +675,28 @@ bool CDXView::CDX::frameStarted(const Ogre::FrameEvent& evt)
 #endif
 
 
+					if (i == VisualSceneNode41 || i == VisualSceneNode15)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode12];
+						adjusted = adjusted* parent.Inverse();
+
+					}
+					else if (i == VisualSceneNode43)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode41];
+
+						adjusted = adjusted* parent.Inverse();
+
+					}
+					else if (i == VisualSceneNode17)
+					{
+						Ogre::Quaternion parent = m_BoneQuats[VisualSceneNode15];
+
+						adjusted = adjusted* parent.Inverse();
+
+					}
+				
+
 					//m_BoneQuats[i] = calculateBoneTransform(i, adjusted);
 
 					m_BoneQuats[i] = adjusted; // calculateBoneTransform(i, adjusted);
@@ -778,8 +814,9 @@ bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 				{
 
 					Ogre::Quaternion absolute = m_BoneQuats[i];
-					Ogre::Quaternion local;
+					Ogre::Quaternion local = absolute;
 
+					/*
 
 					if (i == VisualSceneNode41 || i == VisualSceneNode15)
 					{
@@ -806,7 +843,7 @@ bool CDXView::CDX::frameRenderingQueued(const Ogre::FrameEvent& evt)
 						local = absolute;
 
 					}
-
+					*/
 					Ogre::Quaternion final = calculateBoneTransform(i, local);
 
 
@@ -1052,7 +1089,7 @@ LRESULT CDXView::CDX::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 			float mousePosY = (float)GET_Y_LPARAM(lParam) / (float)_ScreenY;
 			float teta1 = (mousePosX - 0.5f) *3.1416;
 			float teta2 = (mousePosY - 0.5f) *3.1416;
-			float radius = 5.0;
+			float radius = 6.0;
 
 
 			teta1 = -teta1;
@@ -1137,6 +1174,11 @@ LRESULT CDXView::CDX::WndProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			m_showModel = !m_showModel;
 		}
+		else if (c == '9')
+		{
+			m_useFilter = !m_useFilter;
+		}
+		
 
 	}
 	break;

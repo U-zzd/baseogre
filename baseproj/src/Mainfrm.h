@@ -4,8 +4,8 @@
 #ifndef MAINFRM_H
 #define MAINFRM_H
 
-#include "View.h"
 
+#include "View.h"
 
 // Declaration of the CMainFrame class
 class CMainFrame : public CFrame

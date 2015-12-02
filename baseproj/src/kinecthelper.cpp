@@ -11,6 +11,14 @@ bool KinectHelper::initKinect()
 	hr = GetDefaultKinectSensor(&m_pKinectSensor);
 
 	//KinectSensor::GetDefault();
+	m_orientFilter.reset();
+
+	
+	m_orientFilter.m_smoothParameters.Smoothing = 0.5f;
+	m_orientFilter.m_smoothParameters.Correction = 0.15f;
+	m_orientFilter.m_smoothParameters.Prediction = 0.25f;
+	m_orientFilter.m_smoothParameters.JitterRadius = 0.1f;
+	m_orientFilter.m_smoothParameters.MaxDeviationRadius = 0.1f;
 
 
 	for (int i = 0; i < JointType_Count; i++)
@@ -186,21 +194,21 @@ void KinectHelper::processBody(int nBodyCount, IBody** ppBodies)
 
 			if (SUCCEEDED(hr) && bTracked)
 			{
-			//	Joint joints[JointType_Count];
+				Joint joints[JointType_Count];
 				JointOrientation oriens[JointType_Count];
-
+				
 				//HandState leftHandState = HandState_Unknown;
 				//HandState rightHandState = HandState_Unknown;
 
 				// pBody->get_HandLeftState(&leftHandState);
 				// pBody->get_HandRightState(&rightHandState);
 
-				//hr = pBody->GetJoints(_countof(joints), joints);
+				hr = pBody->GetJoints(_countof(joints), joints);
 		
 				//if (SUCCEEDED(hr))
 				//{
 				hr = pBody->GetJointOrientations(_countof(oriens), oriens);
-
+				
 				if (SUCCEEDED(hr))
 				{
 
@@ -213,16 +221,25 @@ void KinectHelper::processBody(int nBodyCount, IBody** ppBodies)
 							oriens[j].Orientation.y,
 							oriens[j].Orientation.z);
 
-					//	Ogre::Vector3 vec = Ogre::Vector3(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z);
+						Ogre::Vector3 vec = Ogre::Vector3(joints[j].Position.X, joints[j].Position.Y, joints[j].Position.Z);
 
 
 //							m_boneMapping[j].pos = vec;
-						m_boneMapping[j].ori = ori;
+						m_boneMapping[j].ori = ori;						
+						m_boneMapping[j].pos = vec;
+						m_boneMapping[j].state = joints[j].TrackingState;
+
 						m_lastFrameOk = true;
+					
+						//filter the orientations
+										
+					
 					}
-
-				
-
+					
+					if (m_lastFrameOk)
+					{
+						m_orientFilter.filter(m_boneMapping, m_boneMappingFiltered);
+					};
 				}
 				//}
 			}
@@ -234,5 +251,8 @@ void KinectHelper::processBody(int nBodyCount, IBody** ppBodies)
 
 			
 }
+
+
+
 
 

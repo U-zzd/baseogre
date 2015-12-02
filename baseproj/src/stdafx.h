@@ -62,7 +62,6 @@
 #include <wxx_wincore.h>
 #include <Kinect.h>
 
-
 // Safe release for interfaces
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease)

@@ -30,6 +30,7 @@
     <ClCompile Include="..\src\debugdrawer.cpp" />
     <ClCompile Include="..\src\DXApp.cpp" />
     <ClCompile Include="..\src\kinecthelper.cpp" />
+    <ClCompile Include="..\src\kinectorientfilter.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mainfrm.cpp" />
     <ClCompile Include="..\src\StdAfx.cpp">
@@ -79,6 +80,7 @@
     <ClInclude Include="..\src\debugdrawer.h" />
     <ClInclude Include="..\src\DXApp.h" />
     <ClInclude Include="..\src\kinecthelper.h" />
+    <ClInclude Include="..\src\kinectorientfilter.h" />
     <ClInclude Include="..\src\Mainfrm.h" />
     <ClInclude Include="..\src\ogreeuler.h" />
     <ClInclude Include="..\src\resource.h" />
@@ -193,7 +195,7 @@
       <MinimalRebuild>true</MinimalRebuild>
       <Optimization>Disabled</Optimization>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;INCLUDE_RTSHADER_SYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx;$(ProjectDir)\..\..\include\OIS;$(ProjectDir)\..\..\boost;$(ProjectDir)\..\..\include\OGRE;$(ProjectDir)\..\..\include\OGRE\RenderSystems\GL;$(ProjectDir)\..\..\include</AdditionalIncludeDirectories>
       <ProgramDataBaseFileName>$(SolutionDir)..\..\bin\Debug\vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
@@ -204,6 +206,7 @@
       <GenerateManifest>false</GenerateManifest>
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;kinect20.lib;comctl32.lib;Winmm.lib;..\..\lib\Debug\OgreMain_d.lib;..\..\boost\lib\libboost_thread-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_date_time-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_system-vc120-mt-gd-1_59.lib;..\..\boost\lib\libboost_chrono-vc120-mt-gd-1_59.lib;..\..\lib\Debug\OgreRTShaderSystem_d.lib;..\..\lib\Debug\OgreTerrain_d.lib;..\..\lib\Debug\OgrePaging_d.lib;..\..\lib\Debug\OgreVolume_d.lib;..\..\lib\Debug\OgreOverlay_d.lib;..\..\lib\Debug\opt\RenderSystem_GL_d.lib;..\..\lib\Debug\OIS_d.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(ProjectDir)\..\..\boost\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>/verbose:lib </AdditionalOptions>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\include\wincxx</AdditionalIncludeDirectories>

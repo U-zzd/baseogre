@@ -1,6 +1,7 @@
 #ifndef KINECT_HELPER
 #define KINECT_HELPER
 
+#include "kinectorientfilter.h"
 
 	class KinectHelper 
 	{
@@ -9,19 +10,11 @@
 
 		IKinectSensor*          m_pKinectSensor;
 		IBodyFrameReader*       m_pBodyFrameReader;
-
-
-		typedef struct _JointRead
-		{
-
-			Ogre::Quaternion ori;
-			Ogre::Vector3 pos;
-			int boneIndex;
 		
 
-		} JointRead;
-
-		std::array<JointRead, JointType_Count> m_boneMapping;
+		JointsCollection m_boneMapping;
+		JointsCollection m_boneMappingFiltered;
+		KinectOrientFilter m_orientFilter;
 
 
 		bool m_initialized;

@@ -3,11 +3,11 @@
 
 #ifndef VIEW_H
 #define VIEW_H
+
 #include "Ogre.h"
 #include "ogreeuler.h"
-#include "kinecthelper.h"
-#include "debugdrawer.h"
 
+#include "kinecthelper.h"
 // NOTE: for MS compilers you will need the DirectX SDK v9
 //       for Dev-C++ you will need the DirecX v9.0c DevPak
 
@@ -70,6 +70,8 @@ class CDXView : public CWnd
 	private:
 	
 		bool m_First;
+		bool m_useFilter;
+
 		int mDrawOrient;
 		int m_boneIndex;
 		bool m_mouseDown;
